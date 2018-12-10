@@ -108,7 +108,7 @@ bintray {
     pkg.apply {
         repo = "maven"
         name = "rxreduxk"
-        desc = "Abstract Data Type (ADT) to represent data that is fetching from the remote sources"
+        desc = "micro-framework for Redux implemented in Kotlin"
         userOrg = "mercari-inc"
         websiteUrl = "https://github.com/mercari/rxredux"
         vcsUrl = "https://github.com/mercari/rxredux"
