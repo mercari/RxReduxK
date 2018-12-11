@@ -22,7 +22,7 @@ dependencies {
     // assertion
     testImplementation("org.amshove.kluent:kluent-android:${extra.get("kluentVersion")}")
 
-    //spek2
+    // spek2
     val spekVersion = extra.get("spekVersion") as String
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
