@@ -60,7 +60,7 @@ class Store<S : State>(
 
     private val middlewares = mutableListOf<Middleware<S>>()
 
-    // be default, this is doing nothing, just passing reduced state through
+    // By default, this is doing nothing, just passing the reduced state
     override var replaceReducer: (S, Action) -> S = { reducedState, _ -> reducedState }
 
     init {

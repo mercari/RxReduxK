@@ -42,7 +42,7 @@ class ReduxTest : Spek({
                 test.assertValuesOnly(CounterState(0), CounterState(2))
             }
 
-            it("should cdescribetinue increasing counter") {
+            it("should continue increasing counter") {
                 store.dispatch(Increment(10))
                 test.assertValuesOnly(CounterState(0), CounterState(2), CounterState(12))
             }
@@ -57,7 +57,7 @@ class ReduxTest : Spek({
                 test.assertValuesOnly(CounterState(0), CounterState(-9))
             }
 
-            it("should cdescribetinue decreasing counter") {
+            it("should continue decreasing counter") {
                 store.dispatch(Decrement(1))
                 test.assertValuesOnly(CounterState(0), CounterState(-9), CounterState(-10))
             }
@@ -82,7 +82,7 @@ class ReduxTest : Spek({
                 localSubscriber.assertValuesOnly(CounterState(1))
             }
 
-            it("should support dispatch of Observable<Actidescribe>") {
+            it("should support dispatch of Observable<Action>") {
                 val obs = Observable.just(Decrement(23))
                 store.dispatch(obs)
 
@@ -90,7 +90,7 @@ class ReduxTest : Spek({
                 test.assertValueAt(lastIndex) { (it.counter == -22).shouldBeTrue() }
             }
 
-            it("should not dispatch actidescribe if the Observable gets disposed") {
+            it("should not dispatch an action if the Observable gets disposed") {
                 val localSubscriber = store.states.test()
 
                 val obs = Observable.just(Increment(100)).delay(3000, TimeUnit.MILLISECONDS)
@@ -123,7 +123,7 @@ class ReduxTest : Spek({
             val sideEffectData = SideEffectData(0)
             val updateSideEffectDataMiddleware = object : Middleware<CounterState> {
 
-                override fun performAfterReducingState(actidescribe: Action, nextState: CounterState) {
+                override fun performAfterReducingState(action: Action, nextState: CounterState) {
                     sideEffectData.value = nextState.counter
                 }
             }
@@ -166,7 +166,7 @@ class ReduxTest : Spek({
                 sideEffectData.value shouldEqual (counter + 38 - 12)
             }
 
-            it("should able to support multiple side effects as state gets updated") {
+            it("should be able to support multiple side effects as state gets updated") {
                 var latestAction: Action? = null
 
                 val middleware = object : Middleware<CounterState> {
@@ -211,11 +211,11 @@ class ReduxTest : Spek({
 
                 val middleware = object : Middleware<CounterState> {
 
-                    override fun performBeforeReducingState(currentState: CounterState, actidescribe: Action) {
+                    override fun performBeforeReducingState(currentState: CounterState, action: Action) {
                         before = currentState.counter
                     }
 
-                    override fun performAfterReducingState(actidescribe: Action, nextState: CounterState) {
+                    override fun performAfterReducingState(action: Action, nextState: CounterState) {
                         after = nextState.counter
                     }
                 }
