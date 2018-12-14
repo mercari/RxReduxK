@@ -17,3 +17,7 @@ dependencies {
 
 implementation("com.mercari.rxredux:rxredux:<latest-version>")
 ```
+
+## Documentation
+
+TBD
