@@ -35,6 +35,8 @@ interface StoreType<S : State> {
 
     fun dispatch(actions: Observable<out Action>): Disposable
 
+    fun dispatch(vararg actions: Observable<out Action>): List<Disposable>
+
     fun addMiddleware(middleware: Middleware<S>)
 
     fun removeMiddleware(middleware: Middleware<S>): Boolean
@@ -87,6 +89,11 @@ class Store<S : State>(
 
     @CheckReturnValue
     override fun dispatch(actions: Observable<out Action>): Disposable = actions.subscribe(actionSubject::onNext)
+
+    @CheckReturnValue
+    override fun dispatch(vararg actions: Observable<out Action>): List<Disposable> =
+            actions.asList()
+                    .map { it.subscribe(actionSubject::onNext) }
 
     override fun addMiddleware(middleware: Middleware<S>) {
         middlewares.add(middleware)

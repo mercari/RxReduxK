@@ -8,6 +8,7 @@ import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MINUTES
 
 data class CounterState(val counter: Int = 0) : State
 
@@ -98,6 +99,17 @@ class ReduxTest : Spek({
                 test.assertValueAt(lastIndex) { (it.counter == -22).shouldBeTrue() }
             }
 
+            it("should support dispatch of List of Observable<Action>") {
+                val ob1 = Observable.just(Decrement(2))
+                val ob2 = Observable.just(Decrement(10))
+                val ob3 = Observable.just(Increment(15))
+
+                store.dispatch(ob1, ob2, ob3)
+
+                val lastIndex = test.valueCount() - 1
+                test.values()[lastIndex].counter shouldEqual -19
+            }
+
             it("should not dispatch an action if the Observable gets disposed") {
                 val localSubscriber = store.states.test()
 
@@ -107,6 +119,22 @@ class ReduxTest : Spek({
                 disposable.dispose()
 
                 localSubscriber.assertValueCount(1)
+            }
+
+            it ("should not dispatch an action if the some of the Observable gets disposed") {
+                val localTest = store.states.test()
+
+                val ob1 = Observable.just(Increment(10)).delay(1, MINUTES)
+                val ob2 = Observable.just(Decrement(10)).delay(3, MINUTES)
+                val ob3 = Observable.just(Increment(100))
+
+                val disposables = store.dispatch(ob1, ob2, ob3)
+
+                disposables[0].dispose()
+                disposables[1].dispose()
+
+                // original and the 100
+                localTest.assertValueCount(2)
             }
 
             it("should not receive state changes after it gets disposed") {

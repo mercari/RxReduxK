@@ -1,5 +1,3 @@
-import com.jfrog.bintray.gradle.BintrayExtension
-
 plugins {
     kotlin("jvm")
 
@@ -50,12 +48,11 @@ task<JacocoReport>("codeCoverageReport") {
 
     val mainSrc = "${project.projectDir}/src/main/java"
 
-    sourceDirectories = files(mainSrc)
-    classDirectories = files(tree)
-
-    executionData = fileTree(project.buildDir) {
+    setSourceDirectories(files(mainSrc))
+    setClassDirectories(files(tree))
+    setExecutionData(fileTree(project.buildDir) {
         include("jacoco/*.exec")
-    }
+    })
 
     dependsOn(junitPlatformTest)
 }
