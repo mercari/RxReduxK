@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm")
 
     jacoco
-    id("org.junit.platform.gradle.plugin")
 
     id("maven-publish")
     id("com.jfrog.bintray")
@@ -13,32 +12,34 @@ repositories {
 }
 
 dependencies {
-    val kotlinVersion = extra.get("kotlinVersion") as String
-    implementation(kotlin("stdlib", kotlinVersion))
-    implementation("io.reactivex.rxjava2:rxjava:${extra.get("rxJavaVersion")}")
+    val kotlinVersion = extra.get("kotlinVersion")
+    val rxJavaVersion = extra.get("rxJavaVersion")
+
+    implementation(kotlin("stdlib", "$kotlinVersion"))
+    implementation("io.reactivex.rxjava2:rxjava:$rxJavaVersion")
 
     // assertion
-    testImplementation("org.amshove.kluent:kluent-android:${extra.get("kluentVersion")}")
+    val kluentVersion = extra.get("kluentVersion")
+    testImplementation("org.amshove.kluent:kluent-android:$kluentVersion")
 
     // spek2
-    val spekVersion = extra.get("spekVersion") as String
+    val spekVersion = extra.get("spekVersion")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 jacoco {
     val jacocoVersion = extra.get("jacocoVersion") as String
 
     toolVersion = jacocoVersion
-
-    val junitPlatformTest: JavaExec by tasks
-    applyTo(junitPlatformTest)
 }
 
 task<JacocoReport>("codeCoverageReport") {
     group = "reporting"
-
-    val junitPlatformTest: JavaExec by tasks
 
     reports {
         xml.isEnabled = true
@@ -56,7 +57,8 @@ task<JacocoReport>("codeCoverageReport") {
         include("jacoco/*.exec")
     })
 
-    dependsOn(junitPlatformTest)
+    val test: Test by tasks
+    dependsOn(test)
 }
 
 val artifactGroupId = extra.get("artifactGroupId") as String
