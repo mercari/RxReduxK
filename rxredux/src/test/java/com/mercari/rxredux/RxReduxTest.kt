@@ -31,11 +31,12 @@ class ReduxTest : Spek({
         }
     }
 
-    describe("a redux store") {
+    describe("a redux store with default scheduler") {
 
-        describe("increment action") {
-            val store = Store(counterState, counterReducer, Schedulers.trampoline())
-            val test = store.states.test()
+        val store = Store(counterState, counterReducer)
+        val test = store.states.test()
+
+        context("increment action") {
 
             it("should increase counter") {
                 store.dispatch(Increment(2))
@@ -47,10 +48,14 @@ class ReduxTest : Spek({
                 test.assertValuesOnly(CounterState(0), CounterState(2), CounterState(12))
             }
         }
+    }
 
-        describe("decrement action") {
-            val store = Store(counterState, counterReducer, Schedulers.trampoline())
-            val test = store.states.test()
+    describe("a redux store with default scheduler") {
+
+        val store = Store(counterState, counterReducer)
+        val test = store.states.test()
+
+        context("decrement action") {
 
             it("should decrease counter") {
                 store.dispatch(Decrement(9))
@@ -62,8 +67,11 @@ class ReduxTest : Spek({
                 test.assertValuesOnly(CounterState(0), CounterState(-9), CounterState(-10))
             }
         }
+    }
 
-        describe("store behavior") {
+    describe("a redux store with trampoline scheduler") {
+
+        context("store behavior") {
             val store = Store(counterState, counterReducer, Schedulers.trampoline())
             val test = store.states.test()
 
