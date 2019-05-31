@@ -27,7 +27,9 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = "0.8.1"
+    val jacocoVersion = extra.get("jacocoVersion") as String
+
+    toolVersion = jacocoVersion
 
     val junitPlatformTest: JavaExec by tasks
     applyTo(junitPlatformTest)
