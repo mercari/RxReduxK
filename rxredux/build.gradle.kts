@@ -103,7 +103,7 @@ publishing {
 bintray {
     user = findProperty("BINTRAY_USER") as? String
     key = findProperty("BINTRAY_KEY") as? String
-    override = System.getenv("CIRCLE_BRANCH") == "master"
+    override = false
     publish = true
     setPublications(project.name)
     pkg.apply {
