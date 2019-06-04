@@ -48,7 +48,7 @@ class Store<S : State>(
         defaultScheduler: Scheduler = Schedulers.single()
 ) : StoreType<S> {
 
-    object NoAction : Action
+    private object NoAction : Action
 
     private val actionSubject = PublishSubject.create<Action>()
 
