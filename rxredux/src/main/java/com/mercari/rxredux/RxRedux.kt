@@ -11,46 +11,47 @@ interface Action
 
 interface State
 
-interface Reducer<S : State> {
+interface Reducer<S : State, A : Action> {
 
-    fun reduce(currentState: S, action: Action): S
+    fun reduce(currentState: S, action: A): S
 }
 
-interface Middleware<S : State> {
+interface Middleware<S : State, A : Action> {
 
-    fun performBeforeReducingState(currentState: S, action: Action) {}
+    fun performBeforeReducingState(currentState: S, action: A) {}
 
-    fun performAfterReducingState(action: Action, nextState: S) {}
+    fun performAfterReducingState(action: A, nextState: S) {}
 }
 
-interface StoreType<S : State> {
+interface StoreType<S : State, A : Action> {
 
     val states: Observable<S>
 
     val indistinctStates: Observable<S>
 
-    var replaceReducer: (S, Action) -> S
+    var replaceReducer: (S, A) -> S
 
-    fun dispatch(action: Action)
+    fun dispatch(action: A)
 
-    fun dispatch(actions: Observable<out Action>): Disposable
+    fun dispatch(actions: Observable<out A>): Disposable
 
-    fun dispatch(vararg actions: Observable<out Action>): List<Disposable>
+    fun dispatch(vararg actions: Observable<out A>): List<Disposable>
 
-    fun addMiddleware(middleware: Middleware<S>)
+    fun addMiddleware(middleware: Middleware<S, A>)
 
-    fun removeMiddleware(middleware: Middleware<S>): Boolean
+    fun removeMiddleware(middleware: Middleware<S, A>): Boolean
 }
 
-class Store<S : State>(
+class Store<S : State, A : Action>(
         initialState: S,
-        reducer: Reducer<S>,
+        reducer: Reducer<S, A>,
         defaultScheduler: Scheduler = Schedulers.single()
-) : StoreType<S> {
+) : StoreType<S, A> {
 
+    // seed action
     private object NoAction : Action
 
-    private val actionSubject = PublishSubject.create<Action>()
+    private val actionSubject = PublishSubject.create<A>()
 
     override val states: Observable<S>
         get() = _states.distinctUntilChanged()
@@ -60,10 +61,10 @@ class Store<S : State>(
 
     private val _states: Observable<S>
 
-    private val middlewares = mutableListOf<Middleware<S>>()
+    private val middlewares = mutableListOf<Middleware<S, A>>()
 
     // By default, this is doing nothing, just passing the reduced state
-    override var replaceReducer: (S, Action) -> S = { reducedState, _ -> reducedState }
+    override var replaceReducer: (S, A) -> S = { reducedState, _ -> reducedState }
 
     init {
         _states = actionSubject
@@ -75,7 +76,7 @@ class Store<S : State>(
                 }
                 .doAfterNext { next ->
                     val (nextState, latestAction) = next
-                    middlewares.onEach { it.performAfterReducingState(latestAction, nextState) }
+                    middlewares.onEach { it.performAfterReducingState(latestAction as A, nextState) }
                 }
                 .map(Pair<S, Action>::first)
                 .subscribeOn(defaultScheduler)
@@ -83,21 +84,21 @@ class Store<S : State>(
                 .autoConnect()
     }
 
-    override fun dispatch(action: Action) {
+    override fun dispatch(action: A) {
         actionSubject.onNext(action)
     }
 
     @CheckReturnValue
-    override fun dispatch(actions: Observable<out Action>): Disposable = actions.subscribe(actionSubject::onNext)
+    override fun dispatch(actions: Observable<out A>): Disposable = actions.subscribe(actionSubject::onNext)
 
     @CheckReturnValue
-    override fun dispatch(vararg actions: Observable<out Action>): List<Disposable> =
+    override fun dispatch(vararg actions: Observable<out A>): List<Disposable> =
             actions.asList()
                     .map { it.subscribe(actionSubject::onNext) }
 
-    override fun addMiddleware(middleware: Middleware<S>) {
+    override fun addMiddleware(middleware: Middleware<S, A>) {
         middlewares.add(middleware)
     }
 
-    override fun removeMiddleware(middleware: Middleware<S>) = middlewares.remove(middleware)
+    override fun removeMiddleware(middleware: Middleware<S, A>) = middlewares.remove(middleware)
 }
