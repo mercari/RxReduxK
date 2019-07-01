@@ -21,13 +21,12 @@ class ReduxTest : Spek({
 
     val counterState = CounterState()
 
-    val counterReducer = object : Reducer<CounterState> {
-        override fun reduce(currentState: CounterState, action: Action): CounterState {
+    val counterReducer = object : Reducer<CounterState, CounterAction> {
+        override fun reduce(currentState: CounterState, action: CounterAction): CounterState {
             val counter = currentState.counter
             return when (action) {
                 is Increment -> currentState.copy(counter = counter + action.by)
                 is Decrement -> currentState.copy(counter = counter - action.by)
-                else -> currentState
             }
         }
     }
@@ -121,7 +120,7 @@ class ReduxTest : Spek({
                 localSubscriber.assertValueCount(1)
             }
 
-            it ("should not dispatch an action if the some of the Observable gets disposed") {
+            it("should not dispatch an action if the some of the Observable gets disposed") {
                 val localTest = store.states.test()
 
                 val ob1 = Observable.just(Increment(10)).delay(1, MINUTES)
@@ -157,9 +156,9 @@ class ReduxTest : Spek({
             data class SideEffectData(var value: Int)
 
             val sideEffectData = SideEffectData(0)
-            val updateSideEffectDataMiddleware = object : Middleware<CounterState> {
+            val updateSideEffectDataMiddleware = object : Middleware<CounterState, CounterAction> {
 
-                override fun performAfterReducingState(action: Action, nextState: CounterState) {
+                override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
                     sideEffectData.value = nextState.counter
                 }
             }
@@ -205,9 +204,9 @@ class ReduxTest : Spek({
             it("should be able to support multiple side effects as state gets updated") {
                 var latestAction: Action? = null
 
-                val middleware = object : Middleware<CounterState> {
+                val middleware = object : Middleware<CounterState, CounterAction> {
 
-                    override fun performAfterReducingState(action: Action, nextState: CounterState) {
+                    override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
                         latestAction = action
                     }
                 }
@@ -245,13 +244,13 @@ class ReduxTest : Spek({
                 var before: Int? = null
                 var after: Int? = null
 
-                val middleware = object : Middleware<CounterState> {
+                val middleware = object : Middleware<CounterState, CounterAction> {
 
-                    override fun performBeforeReducingState(currentState: CounterState, action: Action) {
+                    override fun performBeforeReducingState(currentState: CounterState, action: CounterAction) {
                         before = currentState.counter
                     }
 
-                    override fun performAfterReducingState(action: Action, nextState: CounterState) {
+                    override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
                         after = nextState.counter
                     }
                 }
