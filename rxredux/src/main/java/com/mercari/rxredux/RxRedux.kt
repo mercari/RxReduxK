@@ -74,8 +74,7 @@ class Store<S : State, A : Action>(
                     val nextState = replaceReducer(reducedState, action)
                     nextState to action
                 }
-                .doAfterNext { next ->
-                    val (nextState, latestAction) = next
+                .doAfterNext { (nextState, latestAction) ->
                     middlewares.onEach { it.performAfterReducingState(latestAction as A, nextState) }
                 }
                 .map(Pair<S, Action>::first)
