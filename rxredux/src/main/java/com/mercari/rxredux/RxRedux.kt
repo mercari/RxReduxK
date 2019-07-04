@@ -96,9 +96,7 @@ class Store<S : State, A : Action>(
     override fun dispatch(actions: Observable<out A>): Disposable = actions.subscribe(actionSubject::onNext)
 
     @CheckReturnValue
-    override fun dispatch(vararg actions: Observable<out A>): List<Disposable> =
-            actions.asList()
-                    .map { it.subscribe(actionSubject::onNext) }
+    override fun dispatch(vararg actions: Observable<out A>): List<Disposable> = actions.asList().map { it.subscribe(actionSubject::onNext) }
 
     override fun addMiddleware(middleware: Middleware<S, A>) {
         middlewares.add(middleware)
