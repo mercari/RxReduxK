@@ -75,7 +75,12 @@ class Store<S : State, A : Action>(
                     nextState to action
                 }
                 .doAfterNext { (nextState, latestAction) ->
-                    middlewares.onEach { it.performAfterReducingState(latestAction as A, nextState) }
+                    if (latestAction !== NoAction) {
+                        middlewares.onEach {
+                            @Suppress("UNCHECKED_CAST")
+                            it.performAfterReducingState(latestAction as A, nextState)
+                        }
+                    }
                 }
                 .map(Pair<S, Action>::first)
                 .subscribeOn(defaultScheduler)
