@@ -75,7 +75,12 @@ class Store<S : State, A : Action>(
                     nextState to action
                 }
                 .doAfterNext { (nextState, latestAction) ->
-                    middlewares.onEach { it.performAfterReducingState(latestAction as A, nextState) }
+                    if (latestAction !== NoAction) {
+                        middlewares.onEach {
+                            @Suppress("UNCHECKED_CAST")
+                            it.performAfterReducingState(latestAction as A, nextState)
+                        }
+                    }
                 }
                 .map(Pair<S, Action>::first)
                 .subscribeOn(defaultScheduler)
@@ -91,9 +96,7 @@ class Store<S : State, A : Action>(
     override fun dispatch(actions: Observable<out A>): Disposable = actions.subscribe(actionSubject::onNext)
 
     @CheckReturnValue
-    override fun dispatch(vararg actions: Observable<out A>): List<Disposable> =
-            actions.asList()
-                    .map { it.subscribe(actionSubject::onNext) }
+    override fun dispatch(vararg actions: Observable<out A>): List<Disposable> = actions.asList().map { it.subscribe(actionSubject::onNext) }
 
     override fun addMiddleware(middleware: Middleware<S, A>) {
         middlewares.add(middleware)
