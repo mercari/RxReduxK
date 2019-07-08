@@ -153,16 +153,6 @@ class ReduxTest : Spek({
                 localSubscriber.assertValueCount(4)
             }
 
-            data class SideEffectData(var value: Int)
-
-            val sideEffectData = SideEffectData(0)
-            val updateSideEffectDataMiddleware = object : Middleware<CounterState, CounterAction> {
-
-                override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
-                    sideEffectData.value = nextState.counter
-                }
-            }
-
             it("should not invoke subscriber if the state hasn't changed") {
                 val localSubscriber = store.states.test()
 
@@ -186,89 +176,167 @@ class ReduxTest : Spek({
                 localSubscriber.await(500, TimeUnit.MILLISECONDS)
                 localSubscriber.assertValueCount(3)
             }
+        }
 
-            it("should invoke side effect as state gets updated") {
-                store.addMiddleware(updateSideEffectDataMiddleware)
+        describe("a redux store with middleware") {
 
-                val localSubscriber = store.states.test()
-                val counter = localSubscriber.values().first().counter
+            context("middleware behavior") {
+                data class SideEffectData(var value: Int)
+                val sideEffectBothData = SideEffectData(0)
+                val initialState = CounterState(0)
+                val action = Increment(1)
 
-                store.dispatch(Increment(38))
-                store.dispatch(Decrement(12))
-
-                store.removeMiddleware(updateSideEffectDataMiddleware)
-
-                sideEffectData.value shouldEqual (counter + 38 - 12)
-            }
-
-            it("should be able to support multiple side effects as state gets updated") {
-                var latestAction: Action? = null
-
-                val middleware = object : Middleware<CounterState, CounterAction> {
-
-                    override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
-                        latestAction = action
-                    }
-                }
-
-                store.addMiddleware(updateSideEffectDataMiddleware)
-                store.addMiddleware(middleware)
-
-                val localSubscriber = store.states.test()
-                val counter = localSubscriber.values().first().counter
-
-                store.dispatch(Increment(67))
-                store.dispatch(Decrement(30))
-
-                sideEffectData.value shouldEqual (counter + 67 - 30)
-                latestAction shouldBeInstanceOf Decrement::class
-
-                store.removeMiddleware(updateSideEffectDataMiddleware)
-                store.removeMiddleware(middleware)
-            }
-
-            it("should invoke side effect up until side effect got removed") {
-                store.addMiddleware(updateSideEffectDataMiddleware)
-
-                val localSubscriber = store.states.test()
-                val counter = localSubscriber.values().first().counter
-
-                store.dispatch(Increment(98))
-                store.removeMiddleware(updateSideEffectDataMiddleware)
-                store.dispatch(Decrement(49))
-
-                sideEffectData.value shouldEqual (counter + 98)
-            }
-
-            it("should invoke side effect methods in correct order") {
-                var before: Int? = null
-                var after: Int? = null
-
-                val middleware = object : Middleware<CounterState, CounterAction> {
+                val overrideBothMiddleware = object : Middleware<CounterState, CounterAction> {
 
                     override fun performBeforeReducingState(currentState: CounterState, action: CounterAction) {
-                        before = currentState.counter
+                        sideEffectBothData.value = currentState.counter - 1
                     }
 
                     override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
-                        after = nextState.counter
+                        sideEffectBothData.value = nextState.counter + 1
                     }
                 }
 
-                store.addMiddleware(middleware)
+                it("should perform both side effects with overrideBothMiddleware") {
+                    overrideBothMiddleware.performBeforeReducingState(initialState, action)
+                    sideEffectBothData.value shouldEqual initialState.counter - 1
 
-                val localSubscriber = store.states.test()
-                val counter = localSubscriber.values().first().counter
+                    overrideBothMiddleware.performAfterReducingState(action, initialState)
+                    sideEffectBothData.value shouldEqual initialState.counter + 1
+                }
 
-                store.dispatch(Increment(183))
-                before shouldEqual counter
-                after shouldEqual (counter + 183)
+                val sideEffectBeforeOnlyData = SideEffectData(0)
 
-                store.dispatch(Decrement(21))
-                before shouldEqual (counter + 183)
-                after shouldEqual (counter + 183 - 21)
+                val overrideBeforeOnlyMiddleware = object : Middleware<CounterState, CounterAction> {
 
-                store.removeMiddleware(middleware)
+                    override fun performBeforeReducingState(currentState: CounterState, action: CounterAction) {
+                        sideEffectBeforeOnlyData.value = currentState.counter - 1
+                    }
+                }
+
+                it("should do nothing after reducing the state, with overrideBeforeOnlyMiddleware") {
+                    overrideBeforeOnlyMiddleware.performBeforeReducingState(initialState, action)
+                    sideEffectBeforeOnlyData.value shouldEqual initialState.counter - 1
+
+                    overrideBeforeOnlyMiddleware.performAfterReducingState(action, initialState)
+                    sideEffectBeforeOnlyData.value shouldEqual initialState.counter - 1
+                }
+
+                val sideEffectAfterOnlyData = SideEffectData(0)
+
+                val overrideAfterOnlyMiddleware = object : Middleware<CounterState, CounterAction> {
+
+                    override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
+                        sideEffectAfterOnlyData.value = nextState.counter + 1
+                    }
+                }
+
+                it("should do nothing before reducing the state, with overrideAfterOnlyMiddleware") {
+                    overrideAfterOnlyMiddleware.performBeforeReducingState(initialState, action)
+                    sideEffectAfterOnlyData.value shouldEqual 0
+
+                    overrideAfterOnlyMiddleware.performAfterReducingState(action, initialState)
+                    sideEffectAfterOnlyData.value shouldEqual initialState.counter + 1
+                }
+            }
+
+            context("store behavior") {
+                val store = Store(counterState, counterReducer, Schedulers.trampoline())
+                val test = store.states.test()
+
+                data class SideEffectData(var value: Int)
+
+                val sideEffectData = SideEffectData(0)
+                val updateSideEffectDataMiddleware = object : Middleware<CounterState, CounterAction> {
+
+                    override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
+                        sideEffectData.value = nextState.counter
+                    }
+                }
+
+                it("should invoke side effect as state gets updated") {
+                    store.addMiddleware(updateSideEffectDataMiddleware)
+
+                    val localSubscriber = store.states.test()
+                    val counter = localSubscriber.values().first().counter
+
+                    store.dispatch(Increment(38))
+                    store.dispatch(Decrement(12))
+
+                    store.removeMiddleware(updateSideEffectDataMiddleware)
+
+                    sideEffectData.value shouldEqual (counter + 38 - 12)
+                }
+
+                it("should be able to support multiple side effects as state gets updated") {
+                    var latestAction: Action? = null
+
+                    val middleware = object : Middleware<CounterState, CounterAction> {
+
+                        override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
+                            latestAction = action
+                        }
+                    }
+
+                    store.addMiddleware(updateSideEffectDataMiddleware)
+                    store.addMiddleware(middleware)
+
+                    val localSubscriber = store.states.test()
+                    val counter = localSubscriber.values().first().counter
+
+                    store.dispatch(Increment(67))
+                    store.dispatch(Decrement(30))
+
+                    sideEffectData.value shouldEqual (counter + 67 - 30)
+                    latestAction shouldBeInstanceOf Decrement::class
+
+                    store.removeMiddleware(updateSideEffectDataMiddleware)
+                    store.removeMiddleware(middleware)
+                }
+
+                it("should invoke side effect up until side effect got removed") {
+                    store.addMiddleware(updateSideEffectDataMiddleware)
+
+                    val localSubscriber = store.states.test()
+                    val counter = localSubscriber.values().first().counter
+
+                    store.dispatch(Increment(98))
+                    store.removeMiddleware(updateSideEffectDataMiddleware)
+                    store.dispatch(Decrement(49))
+
+                    sideEffectData.value shouldEqual (counter + 98)
+                }
+
+                it("should invoke side effect methods in correct order") {
+                    var before: Int? = null
+                    var after: Int? = null
+
+                    val middleware = object : Middleware<CounterState, CounterAction> {
+
+                        override fun performBeforeReducingState(currentState: CounterState, action: CounterAction) {
+                            before = currentState.counter
+                        }
+
+                        override fun performAfterReducingState(action: CounterAction, nextState: CounterState) {
+                            after = nextState.counter
+                        }
+                    }
+
+                    store.addMiddleware(middleware)
+
+                    val localSubscriber = store.states.test()
+                    val counter = localSubscriber.values().first().counter
+
+                    store.dispatch(Increment(183))
+                    before shouldEqual counter
+                    after shouldEqual (counter + 183)
+
+                    store.dispatch(Decrement(21))
+                    before shouldEqual (counter + 183)
+                    after shouldEqual (counter + 183 - 21)
+
+                    store.removeMiddleware(middleware)
+                }
             }
         }
     }
