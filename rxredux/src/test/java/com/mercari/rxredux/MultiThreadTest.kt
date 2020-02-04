@@ -4,6 +4,7 @@ import io.reactivex.Observable
 import org.amshove.kluent.shouldBe
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
+import java.security.SecureRandom
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -29,11 +30,9 @@ object MultiThreadTest : Spek({
 
         context("increment actions in parallel") {
 
-            MultiThreadTest.incrementCounter(store, errorCounter)
-            MultiThreadTest.incrementCounter(store, errorCounter)
-            MultiThreadTest.incrementCounter(store, errorCounter)
-            MultiThreadTest.incrementCounter(store, errorCounter)
-            MultiThreadTest.incrementCounter(store, errorCounter)
+            repeat(10) {
+                MultiThreadTest.incrementCounter(store, errorCounter)
+            }
 
             it("should no errors") {
                 test.await(5_000L, MILLISECONDS)
@@ -44,11 +43,10 @@ object MultiThreadTest : Spek({
 }) {
 
     private fun incrementCounter(store: Store<CounterState, CounterAction>, errorCounter: AtomicInteger) {
-        Observable.interval(0L, 10L, MILLISECONDS)
+        Observable.interval(0L, SecureRandom().nextLong(), MILLISECONDS)
             .subscribe({
                 store.dispatch(Increment(1))
             }, {
-                it.printStackTrace()
                 errorCounter.incrementAndGet()
             })
     }
