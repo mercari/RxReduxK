@@ -1,7 +1,8 @@
 package com.mercari.rxredux
 
 import io.reactivex.Observable
-import org.amshove.kluent.shouldBe
+import org.amshove.kluent.shouldBeGreaterThan
+import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.security.SecureRandom
@@ -22,9 +23,35 @@ object MultiThreadTest : Spek({
         }
     }
 
-    describe("a redux store with default scheduler") {
+    describe("a redux store with default PublishSubject") {
 
-        val store = Store(counterState, counterReducer)
+        val store = Store(
+            initialState = counterState,
+            reducer = counterReducer
+        )
+        val test = store.states.test()
+        val errorCounter = AtomicInteger(0)
+
+        context("increment actions in parallel") {
+
+            repeat(10) {
+                MultiThreadTest.incrementCounter(store, errorCounter)
+            }
+
+            it("should errors") {
+                test.await(5_000L, MILLISECONDS)
+                errorCounter.get() shouldBeGreaterThan 0
+            }
+        }
+    }
+
+    describe("a redux store with serialized PublishSubject") {
+
+        val store = Store(
+            initialState = counterState,
+            reducer = counterReducer,
+            serializeActions = true
+        )
         val test = store.states.test()
         val errorCounter = AtomicInteger(0)
 
@@ -36,7 +63,7 @@ object MultiThreadTest : Spek({
 
             it("should no errors") {
                 test.await(5_000L, MILLISECONDS)
-                errorCounter.get() shouldBe 0
+                errorCounter.get() shouldEqual 0
             }
         }
     }

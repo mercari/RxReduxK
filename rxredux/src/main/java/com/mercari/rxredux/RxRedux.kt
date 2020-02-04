@@ -45,13 +45,16 @@ interface StoreType<S : State, A : Action> {
 class Store<S : State, A : Action>(
         initialState: S,
         reducer: Reducer<S, A>,
-        defaultScheduler: Scheduler = Schedulers.single()
+        defaultScheduler: Scheduler = Schedulers.single(),
+        serializeActions: Boolean = false
 ) : StoreType<S, A> {
 
     // seed action
     private object NoAction : Action
 
-    private val actionSubject = PublishSubject.create<A>()
+    private val actionSubject = PublishSubject.create<A>().let {
+        if (serializeActions) it.toSerialized() else it
+    }
 
     override val states: Observable<S>
         get() = _states.distinctUntilChanged()
