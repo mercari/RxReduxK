@@ -61,8 +61,9 @@ task<JacocoReport>("codeCoverageReport") {
     dependsOn(test)
 }
 
-val artifactGroupId = extra.get("artifactGroupId") as String
-val artifactPublishVersion = extra.get("artifactPublishVersion") as String
+//val artifactGroupId = extra.get("artifactGroupId") as String
+val artifactGroupId = Artifact.groupdId
+val artifactPublishVersion = Artifact.version
 
 group = artifactGroupId
 version = artifactPublishVersion
