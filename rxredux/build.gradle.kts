@@ -12,20 +12,15 @@ repositories {
 }
 
 dependencies {
-    val kotlinVersion = extra.get("kotlinVersion")
-    val rxJavaVersion = extra.get("rxJavaVersion")
-
-    implementation(kotlin("stdlib", "$kotlinVersion"))
-    implementation("io.reactivex.rxjava2:rxjava:$rxJavaVersion")
+    implementation(kotlin(Dependencies.kotlin, Version.kotlin))
+    implementation(Dependencies.rxJava)
 
     // assertion
-    val kluentVersion = extra.get("kluentVersion")
-    testImplementation("org.amshove.kluent:kluent-android:$kluentVersion")
+    testImplementation(TestDependencies.kluent)
 
     // spek2
-    val spekVersion = extra.get("spekVersion")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
+    testImplementation(TestDependencies.spek)
+    testRuntimeOnly(TestDependencies.spekRunner)
 }
 
 tasks.withType<Test> {
@@ -33,9 +28,7 @@ tasks.withType<Test> {
 }
 
 jacoco {
-    val jacocoVersion = extra.get("jacocoVersion") as String
-
-    toolVersion = jacocoVersion
+    toolVersion = Version.jacoco
 }
 
 task<JacocoReport>("codeCoverageReport") {
