@@ -44,9 +44,9 @@ task<JacocoReport>("codeCoverageReport") {
 
     val mainSrc = "${project.projectDir}/src/main/java"
 
-    setSourceDirectories(files(mainSrc))
-    setClassDirectories(files(tree))
-    setExecutionData(fileTree(project.buildDir) {
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(tree))
+    executionData.setFrom(fileTree(project.buildDir) {
         include("jacoco/*.exec")
     })
 
@@ -66,7 +66,7 @@ val sourceSets = project.the<SourceSetContainer>()
 
 val sourcesJar by tasks.creating(Jar::class) {
     from(sourceSets["main"].allSource)
-    classifier = "sources"
+    archiveClassifier.set("sources")
 }
 
 val doc by tasks.creating(Javadoc::class) {
@@ -77,7 +77,7 @@ val javadocJar by tasks.creating(Jar::class) {
     dependsOn(doc)
     from(doc)
 
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
 }
 
 publishing {
