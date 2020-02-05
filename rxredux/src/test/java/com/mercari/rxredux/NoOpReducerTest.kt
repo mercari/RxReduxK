@@ -10,17 +10,17 @@ object NoOpReducerTest : Spek({
 
     Scenario("Reducing the state with NoOpReducer") {
 
-      lateinit var reducer: NoOpReducer<TestState, TestAction>
-      lateinit var state: TestState
-      lateinit var newState: TestState
+      lateinit var reducer: NoOpReducer<NoOpReducerTestState, NoOpReducerTestAction>
+      lateinit var state: NoOpReducerTestState
+      lateinit var newState: NoOpReducerTestState
 
       Given("Initialize NoOpReducer") {
         reducer = NoOpReducer()
-        state = TestState()
+        state = NoOpReducerTestState()
       }
 
       When("Reduce the action") {
-        newState = reducer.reduce(state, TestAction)
+        newState = reducer.reduce(state, NoOpReducerTestAction)
       }
 
       Then("No state changes will happen") {
@@ -30,6 +30,6 @@ object NoOpReducerTest : Spek({
   }
 })
 
-data class TestState(val meaningless: String = "meaningless") : State
+data class NoOpReducerTestState(val meaningless: String = "meaningless") : State
 
-object TestAction : Action
+object NoOpReducerTestAction : Action
