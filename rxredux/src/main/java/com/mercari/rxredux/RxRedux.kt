@@ -1,11 +1,11 @@
 package com.mercari.rxredux
 
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.annotations.CheckReturnValue
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.rxjava3.annotations.CheckReturnValue
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
 
 interface Action
 
@@ -43,10 +43,10 @@ interface StoreType<S : State, A : Action> {
 }
 
 class Store<S : State, A : Action>(
-        initialState: S,
-        reducer: Reducer<S, A>,
-        defaultScheduler: Scheduler = Schedulers.single(),
-        serializeActions: Boolean = false
+    initialState: S,
+    reducer: Reducer<S, A>,
+    defaultScheduler: Scheduler = Schedulers.single(),
+    serializeActions: Boolean = false
 ) : StoreType<S, A> {
 
     // seed action

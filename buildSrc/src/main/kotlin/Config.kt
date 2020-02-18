@@ -10,7 +10,7 @@ object MavenUrl {
 object Version {
   const val bintray = "1.8.4"
   const val kotlin = "1.3.30"
-  const val rxJava = "2.2.9"
+  const val rxJava = "3.0.0"
   const val kluent = "1.49"
   const val spek = "2.0.2"
   const val jacoco = "0.8.4"
@@ -23,7 +23,7 @@ object Classpath {
 
 object Dependencies {
   const val kotlin = "stdlib"
-  const val rxJava = "io.reactivex.rxjava2:rxjava:${Version.rxJava}"
+  const val rxJava = "io.reactivex.rxjava3:rxjava:${Version.rxJava}"
 }
 
 object TestDependencies {
