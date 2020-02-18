@@ -1,6 +1,6 @@
 package com.mercari.rxredux
 
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 import org.amshove.kluent.shouldBeGreaterThan
 import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek

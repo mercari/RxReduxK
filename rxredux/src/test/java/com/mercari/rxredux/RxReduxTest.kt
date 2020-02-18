@@ -1,7 +1,11 @@
 package com.mercari.rxredux
 
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldBeTrue
 import org.amshove.kluent.shouldEqual
@@ -94,7 +98,7 @@ class ReduxTest : Spek({
                 val obs = Observable.just(Decrement(23))
                 store.dispatch(obs)
 
-                val lastIndex = test.valueCount() - 1
+                val lastIndex = test.values().size - 1
                 test.assertValueAt(lastIndex) { (it.counter == -22).shouldBeTrue() }
             }
 
@@ -105,7 +109,7 @@ class ReduxTest : Spek({
 
                 store.dispatch(ob1, ob2, ob3)
 
-                val lastIndex = test.valueCount() - 1
+                val lastIndex = test.values().size - 1
                 test.values()[lastIndex].counter shouldEqual -19
             }
 
@@ -145,7 +149,7 @@ class ReduxTest : Spek({
 
                 localSubscriber.assertValueCount(4)
 
-                localSubscriber.cancel()
+                localSubscriber.dispose()
 
                 store.dispatch(Increment(2))
                 store.dispatch(Decrement(3))
