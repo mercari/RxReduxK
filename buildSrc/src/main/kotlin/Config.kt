@@ -12,7 +12,7 @@ object Version {
   const val kotlin = "1.3.30"
   const val rxJava = "2.2.9"
   const val kluent = "1.60"
-  const val spek = "2.0.2"
+  const val spek = "2.0.10"
   const val jacoco = "0.8.4"
 }
 
