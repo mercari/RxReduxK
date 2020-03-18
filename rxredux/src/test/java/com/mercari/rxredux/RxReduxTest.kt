@@ -2,9 +2,9 @@ package com.mercari.rxredux
 
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldBeTrue
-import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.util.concurrent.TimeUnit
@@ -106,7 +106,7 @@ class ReduxTest : Spek({
                 store.dispatch(ob1, ob2, ob3)
 
                 val lastIndex = test.valueCount() - 1
-                test.values()[lastIndex].counter shouldEqual -19
+                test.values()[lastIndex].counter shouldBeEqualTo -19
             }
 
             it("should not dispatch an action if the Observable gets disposed") {
@@ -199,10 +199,10 @@ class ReduxTest : Spek({
 
                 it("should perform both side effects with overrideBothMiddleware") {
                     overrideBothMiddleware.performBeforeReducingState(initialState, action)
-                    sideEffectBothData.value shouldEqual initialState.counter - 1
+                    sideEffectBothData.value shouldBeEqualTo initialState.counter - 1
 
                     overrideBothMiddleware.performAfterReducingState(action, initialState)
-                    sideEffectBothData.value shouldEqual initialState.counter + 1
+                    sideEffectBothData.value shouldBeEqualTo initialState.counter + 1
                 }
 
                 val sideEffectBeforeOnlyData = SideEffectData(0)
@@ -216,10 +216,10 @@ class ReduxTest : Spek({
 
                 it("should do nothing after reducing the state, with overrideBeforeOnlyMiddleware") {
                     overrideBeforeOnlyMiddleware.performBeforeReducingState(initialState, action)
-                    sideEffectBeforeOnlyData.value shouldEqual initialState.counter - 1
+                    sideEffectBeforeOnlyData.value shouldBeEqualTo initialState.counter - 1
 
                     overrideBeforeOnlyMiddleware.performAfterReducingState(action, initialState)
-                    sideEffectBeforeOnlyData.value shouldEqual initialState.counter - 1
+                    sideEffectBeforeOnlyData.value shouldBeEqualTo initialState.counter - 1
                 }
 
                 val sideEffectAfterOnlyData = SideEffectData(0)
@@ -233,10 +233,10 @@ class ReduxTest : Spek({
 
                 it("should do nothing before reducing the state, with overrideAfterOnlyMiddleware") {
                     overrideAfterOnlyMiddleware.performBeforeReducingState(initialState, action)
-                    sideEffectAfterOnlyData.value shouldEqual 0
+                    sideEffectAfterOnlyData.value shouldBeEqualTo 0
 
                     overrideAfterOnlyMiddleware.performAfterReducingState(action, initialState)
-                    sideEffectAfterOnlyData.value shouldEqual initialState.counter + 1
+                    sideEffectAfterOnlyData.value shouldBeEqualTo initialState.counter + 1
                 }
             }
 
@@ -265,7 +265,7 @@ class ReduxTest : Spek({
 
                     store.removeMiddleware(updateSideEffectDataMiddleware)
 
-                    sideEffectData.value shouldEqual (counter + 38 - 12)
+                    sideEffectData.value shouldBeEqualTo (counter + 38 - 12)
                 }
 
                 it("should be able to support multiple side effects as state gets updated") {
@@ -287,7 +287,7 @@ class ReduxTest : Spek({
                     store.dispatch(Increment(67))
                     store.dispatch(Decrement(30))
 
-                    sideEffectData.value shouldEqual (counter + 67 - 30)
+                    sideEffectData.value shouldBeEqualTo (counter + 67 - 30)
                     latestAction shouldBeInstanceOf Decrement::class
 
                     store.removeMiddleware(updateSideEffectDataMiddleware)
@@ -304,7 +304,7 @@ class ReduxTest : Spek({
                     store.removeMiddleware(updateSideEffectDataMiddleware)
                     store.dispatch(Decrement(49))
 
-                    sideEffectData.value shouldEqual (counter + 98)
+                    sideEffectData.value shouldBeEqualTo (counter + 98)
                 }
 
                 it("should invoke side effect methods in correct order") {
@@ -328,12 +328,12 @@ class ReduxTest : Spek({
                     val counter = localSubscriber.values().first().counter
 
                     store.dispatch(Increment(183))
-                    before shouldEqual counter
-                    after shouldEqual (counter + 183)
+                    before shouldBeEqualTo counter
+                    after shouldBeEqualTo (counter + 183)
 
                     store.dispatch(Decrement(21))
-                    before shouldEqual (counter + 183)
-                    after shouldEqual (counter + 183 - 21)
+                    before shouldBeEqualTo (counter + 183)
+                    after shouldBeEqualTo (counter + 183 - 21)
 
                     store.removeMiddleware(middleware)
                 }

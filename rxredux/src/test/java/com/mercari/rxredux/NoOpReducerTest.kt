@@ -1,6 +1,6 @@
 package com.mercari.rxredux
 
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.gherkin.Feature
 
@@ -24,7 +24,7 @@ object NoOpReducerTest : Spek({
       }
 
       Then("No state changes will happen") {
-        newState shouldEqual state
+        newState shouldBeEqualTo state
       }
     }
   }

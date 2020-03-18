@@ -1,7 +1,7 @@
 package com.mercari.rxredux
 
-import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldNotEqual
+import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.gherkin.Feature
 
@@ -25,11 +25,11 @@ object CompositeReducerTest : Spek({
       }
 
       Then("Next state is different from initial state") {
-        nextState shouldNotEqual initialState
+        nextState shouldNotBeEqualTo initialState
       }
 
       And("Next state text should have 2 'A's") {
-        nextState.text shouldEqual "AA"
+        nextState.text shouldBeEqualTo "AA"
       }
     }
 
@@ -47,11 +47,11 @@ object CompositeReducerTest : Spek({
       }
 
       Then("Next state is different from initial state") {
-        nextState shouldNotEqual initialState
+        nextState shouldNotBeEqualTo initialState
       }
 
       And("Next state number should decrease") {
-        nextState.number shouldEqual 9
+        nextState.number shouldBeEqualTo 9
       }
     }
 
@@ -69,7 +69,7 @@ object CompositeReducerTest : Spek({
       }
 
       Then("Next state is the same as initial state") {
-        nextState shouldEqual initialState
+        nextState shouldBeEqualTo initialState
       }
     }
   }

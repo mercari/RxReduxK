@@ -1,8 +1,8 @@
 package com.mercari.rxredux
 
 import io.reactivex.Observable
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeGreaterThan
-import org.amshove.kluent.shouldEqual
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import java.security.SecureRandom
@@ -63,7 +63,7 @@ object MultiThreadTest : Spek({
 
             it("should no errors") {
                 test.await(5_000L, MILLISECONDS)
-                errorCounter.get() shouldEqual 0
+                errorCounter.get() shouldBeEqualTo 0
             }
         }
     }
