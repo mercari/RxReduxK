@@ -43,24 +43,24 @@ data class CounterState(
 An Action represents the desired modifications on a State, for example
 
 ```kotlin
-class Increment: Action
-class Decrement: Action
+class Increment : Action
+class Decrement : Action
 ```
 
 Although not required, it is recommended to model Actions as class hierarchy with a [sealed class](https://kotlinlang.org/docs/reference/sealed-classes.html).
 
 ```kotlin
-sealed class CounterAction: Action
+sealed class CounterAction : Action
 
-class Increment: CounterAction()
-class Decrement: CounterAction()
+class Increment : CounterAction()
+class Decrement : CounterAction()
 ```
 
 An Action can contain parameters that make them more useful depending on the desired behaviour.
 For example:
 
 ```kotlin
-class Increment(val by: Int): CounterAction
+class Increment(val by: Int) : CounterAction
 ```
 
 Actions are to be dispatched through the Store's _dispatch_ method to perform State mutations.
@@ -80,7 +80,7 @@ For example:
 
 ```kotlin
 class CounterReducer: Reducer<CounterState, CounterAction> {
-    override fun reduce(currentState: CounterState, action: CounterAction): CounterState =
+    override fun reduce(currentState: CounterState, action: CounterAction) : CounterState =
         when(action) {
           is Increment -> CounterState(counter: currenState.counter + action.by)
           is Decrement -> CounterState(counter: currenState.counter - action.by)
