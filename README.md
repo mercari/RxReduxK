@@ -2,7 +2,7 @@
 
 [![jcenter](https://api.bintray.com/packages/mercari-inc/maven/rxreduxk/images/download.svg)](https://bintray.com/mercari-inc/maven/rxreduxk/_latestVersion)
 [![Build Status](https://circleci.com/gh/mercari/RxReduxK.svg?style=svg)](https://circleci.com/gh/mercari/RxReduxK)
-[![codecov](https://codecov.io/gh/mercari/rxredux/branch/master/graph/badge.svg)](https://codecov.io/gh/mercari/RxReduxK)
+[![codecov](https://codecov.io/gh/mercari/rxreduxk/branch/master/graph/badge.svg)](https://codecov.io/gh/mercari/RxReduxK)
 
 Micro-framework for Redux implemented in Kotlin
 
@@ -43,8 +43,8 @@ data class CounterState(
 An Action represents the desired modifications on a State, for example
 
 ```kotlin
-class Increment: Action
-class Decrement: Action
+class Increment : Action
+class Decrement : Action
 ```
 
 Although not required, it is recommended to model Actions as class hierarchy with a [sealed class](https://kotlinlang.org/docs/reference/sealed-classes.html).
@@ -52,15 +52,15 @@ Although not required, it is recommended to model Actions as class hierarchy wit
 ```kotlin
 sealed class CounterAction : Action
 
-class Increment: CounterAction()
-class Decrement: CounterAction()
+class Increment : CounterAction()
+class Decrement : CounterAction()
 ```
 
 An Action can contain parameters that make them more useful depending on the desired behaviour.
 For example:
 
 ```kotlin
-class Increment(val by: Int): CounterAction
+class Increment(val by: Int) : CounterAction
 ```
 
 Actions are to be dispatched through the Store's _dispatch_ method to perform State mutations.
@@ -80,7 +80,7 @@ For example:
 
 ```kotlin
 class CounterReducer: Reducer<CounterState, CounterAction> {
-    override fun reduce(currentState: CounterState, action: CounterAction): CounterState =
+    override fun reduce(currentState: CounterState, action: CounterAction) : CounterState =
         when(action) {
           is Increment -> CounterState(counter: currenState.counter + action.by)
           is Decrement -> CounterState(counter: currenState.counter - action.by)
