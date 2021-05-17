@@ -35,8 +35,6 @@ jobs:
 
       - run: ./gradlew codeCoverageReport
 
-      - run: bash <(curl -s https://codecov.io/bash)
-
   deploy:
     <<: *jdk_env
     steps:
