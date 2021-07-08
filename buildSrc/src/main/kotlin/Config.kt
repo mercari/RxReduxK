@@ -9,7 +9,7 @@ object MavenUrl {
 
 object Version {
   const val bintray = "1.8.4"
-  const val kotlin = "1.3.30"
+  const val kotlin = "1.3.70"
   const val rxJava = "2.2.19"
   const val kluent = "1.60"
   const val spek = "2.0.10"
